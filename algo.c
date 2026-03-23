@@ -1,59 +1,26 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
+long  seqnum(int n,long b[]) {//防止越界，不用int
 
-int* change(char str[], int *len) {
-    *len = strlen(str);
-    int *num = (int*)malloc(*len * sizeof(int));
-    if (num == NULL) {
-        return NULL;
+    if (n==1) return b[1]=1;
+    for (int i=1 ;i<=n/2;i++) {
+        if (b[i]==0) {
+            b[i]=seqnum(i,b);
+            b[n]+=b[i];
+        }
+        else {
+            b[n]+=b[i];
+        }
     }
-    for (int i = 0; i < *len; i++) {
-        num[i] = str[*len - 1 - i] - '0';
-    }
-    return num;
+     b[n]=b[n]+1;
+
+    return b[n];
 }
-
 int main() {
-    char str1[2500], str2[2500];
-    scanf("%s %s", str1, str2);
-    int len1,len2;
-    int *num1 = change(str1,&len1);
-    int *num2 = change(str2,&len2);
-    if (num1 == NULL || num2 == NULL) {
-        if (num1) free(num1);
-        if (num2) free(num2);
-        return 1;
-    }
-    int sum[4010]={0};
-
-    for (int i = 0; i < len2; i++) {
-        for (int j = 0; j < len1; j++) {
-            int c=0;
-            c=num1[j] * num2[i]+sum[j+i];
-            sum[j+i] = c%10;
-            sum[j+i+1] = c/10+sum[j+i+1];
-        }
-    }
-    int i =len1+len2-1;
-    while (sum[i]==0) {
-        if (sum[i-1]!=0) {
-            i--;
-            break;
-        }
-
-        i--;
-        if (i==0) {
-            break;
-        }
-
-    }
-    for ( ;i>=0; i--) {
-
-        printf("%d", sum[i]);
-
-    }
-    free(num1);
-    free(num2);
+    int n=0;
+    scanf("%d",&n);
+    long*c=(long*)calloc(n+1,sizeof(long));
+printf("%ld",seqnum(n,c));
+    free(c);
     return 0;
 }
