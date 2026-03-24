@@ -1,35 +1,77 @@
 #include <stdio.h>
-#include <stdlib.h>
-long long w(long long a,long long b,long long c, long long arr[21][21][21]) {
+#define MAX_LEN 200
 
-    if (a<=0||b<=0||c<=0) {
-        return  arr[0][0][0];
+int seq[MAX_LEN];
+static void dfs123(int c1, int c2, int c3, int depth, int total_len) {
+    if (depth == total_len) {
+        for (int i = 0; i < total_len; ++i) {
+            if (i) printf(" ");
+            printf("%d", seq[i]);
+        }
+        printf("\n");
+        return;
     }
-    else if (a>20||b>20||c>20) {
-        return w(20,20,20,arr);
+
+    // 按 1,2,3 的顺序尝试，输出天然为字典序
+    if (c1 > 0) {
+        seq[depth] = 1;
+        dfs123(c1 - 1, c2, c3, depth + 1, total_len);
     }
-    else if (arr[a][b][c]) return arr[a][b][c];
-    else if (a<b&&b<c) {
-        //如果 a<b 并且 b<c 就返回 w(a,b,c−1)+w(a,b−1,c−1)−w(a,b−1,c)。
-        arr[a][b][c]= w(a,b,c-1,arr)+w(a,b-1,c-1,arr)-w(a,b-1,c,arr);
-        return arr[a][b][c];
+    if (c2 > 0) {
+        seq[depth] = 2;
+        dfs123(c1, c2 - 1, c3, depth + 1, total_len);
     }
-    else {
-        //w(a−1,b,c)+w(a−1,b−1,c)+w(a−1,b,c−1)−w(a−1,b−1,c−1)
-         arr[a][b][c]=w(a-1,b,c,arr)+w(a-1,b-1,c,arr)+w(a-1,b,c-1,arr)-w(a-1,b-1,c-1,arr);
-        return arr[a][b][c];
+    if (c3 > 0) {
+        seq[depth] = 3;
+        dfs123(c1, c2, c3 - 1, depth + 1, total_len);
     }
 }
-int main() {
-    long long arr[21][21][21]={0};
-    long long a=0,b=0,c=0;
-    arr[0][0][0]=1;
-    while (1) {
-        scanf("%lld%lld%lld",&a,&b,&c);
-        if (a==-1&&b==-1&&c==-1) break;
-        long long s=w(a,b,c,arr);
-        printf("w(%lld, %lld, %lld) = %lld\n",a,b,c,s);
+void print_permutations_123(int c1, int c2, int c3) {
+    if (c1 < 0 || c2 < 0 || c3 < 0) return;
 
+    int total_len = c1 + c2 + c3;
+    if (total_len > MAX_LEN) return;
+
+    dfs123(c1, c2, c3, 0, total_len);
+}
+
+int combination(int n, int k,int arr[11][11]) {
+    if (k == 0 || n == k) {
+        return 1;
     }
+    if (arr[n][k] !=0) {
+        return arr[n][k];
+    }
+    else if (n<k) return 0;
+    arr[n][k] = combination(n - 1, k - 1,arr) + combination(n - 1, k,arr);
+    return arr[n][k];
+}
+int main() {
+    int n;
+    int m=0;
+    int arr[11][11]={0};
+    scanf("%d",&n);
+    if (n<10||n>30) {
+        printf("%d",m);
+        return 0;
+    }
+
+    int l=n-10;
+    int ans[21]={0};
+    for (int i=l/2;i>=0;i--) {
+        int x=l-2*i;
+        if (x>10) break;
+        ans[n-10]+=combination(10,x,arr)*combination(10-x,i,arr);
+    }
+    int a=ans[n-10];
+    printf("%d\n",a);
+    for (int i=l/2;i>=0;i--) {
+        int x=l-2*i;
+        if (x>10) break;
+       // ans[n-10]+=combination(10,x,arr)*combination(10-x,i,arr);
+        print_permutations_123(10-x-i,x,i);
+    }
+
+
     return 0;
 }
