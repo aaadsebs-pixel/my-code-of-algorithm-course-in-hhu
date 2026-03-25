@@ -1,33 +1,58 @@
 #include <stdio.h>
-#include <string.h>
-int arr[10]={0};
-void get(int a) {
-    arr[a%10]=1;
-    arr[a/10%10]=1;
-    arr[a/100]=1;
+#include <math.h>
+#include <stdlib.h>
+int get(int arr[],int n) {
+    for (int i=0;i<n;i++) {
+        if (arr[i]==arr[n]||abs(arr[i]-arr[n])==abs(i-n)) return 0;
+    }
+    return 1;
 }
 int main() {
-    int a,b,c;
-    int d=0,e=0,count=0;
-    scanf("%d%d%d",&a,&b,&c);
-    for (int i=123;i<988;i++) {
-        if(i*b%a||i*c%a) continue;
-        d=i*b/a;
-        e=i*c/a;
-        if (d>987||e>987) break;
-        get(i);
-        get(d);
-        get(e);
-        int j=1;
-        for (;j<10;j++) {
-            if (arr[j]==0) break;
-        }
-if (j==10) {
-    printf("%d %d %d\n",i,d,e);
-    count++;
-}
-memset(arr,0,sizeof(arr));
+    int n;
+    scanf("%d", &n);
+int*jp=(int*)calloc(n,sizeof(int));
+    if (jp==NULL) {
+        free(jp);
+        return 0;
     }
-    if (count==0) printf("No!!!");
+    int count=0;
+    int i=0;
+    int j=0;
+    while (i>=0) {
+
+        for (;j<n;j++) {
+            jp[i]=j;
+            if (get(jp,i))break;
+        }
+        if (j<n) {
+            if (i==n-1) {
+                count++;
+                if (count<4) {
+                    for (int m=0;m<n;m++) {
+                        printf("%d ",jp[m]+1);
+                    }
+                    printf("\n");
+                }
+                    jp[i]=0;
+                i--;
+                j=jp[i]+1;
+
+            }
+            else  {
+                jp[i]=j;
+                i++;
+                j=0;
+            }
+        }
+        else {
+            i--;
+            j=jp[i]+1;
+        }
+
+
+
+    }
+    printf("%d",count);
+    free(jp);
     return 0;
 }
