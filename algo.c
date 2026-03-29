@@ -1,70 +1,43 @@
 #include <stdio.h>
-
-int stepA[4], stepB[4], stepR[4];
-char stepOp[4];
-int stepCount = 0;
-
-int equal(int a,int b) {
-    if (a==b) return 1;
-    else return 0;
+#include <string.h>
+int arr[100][100]={0};
+int brr[100][100]={0};
+int n=0,m=0;
+void change(char str[], int k,int m) {
+    for (int i = 0; i < m; i++) {
+        arr[k][i] = str[m - 1 - i] - '0';
+    }
 }
-
-int solve(int arr[],int n,int depth) {
-    if (n==1) {
-        if (equal(arr[0],24)) {
-            stepCount = depth;
-            return 1;
-        }
-        return 0;
-    } else {
-        for (int i=0;i<n;i++) {
-            for (int j=0;j<n;j++) {
-                if (i==j) continue;
-
-                int temp[4]={0};
-                int k=0;
-                for (int m=0;m<n;m++) {
-                    if (m!=i && m!=j) temp[k++]=arr[m];
-                }
-
-                // +
-                temp[k]=arr[i]+arr[j];
-                stepA[depth]=arr[i]; stepB[depth]=arr[j]; stepOp[depth]='+'; stepR[depth]=temp[k];
-                if (solve(temp,k+1,depth+1)) return 1;
-
-                // -
-                temp[k]=arr[i]-arr[j];
-                stepA[depth]=arr[i]; stepB[depth]=arr[j]; stepOp[depth]='-'; stepR[depth]=temp[k];
-                if (solve(temp,k+1,depth+1)) return 1;
-
-                // *
-                temp[k]=arr[i]*arr[j];
-                stepA[depth]=arr[i]; stepB[depth]=arr[j]; stepOp[depth]='*'; stepR[depth]=temp[k];
-                if (solve(temp,k+1,depth+1)) return 1;
-
-                // /
-                if (arr[j]!=0 && arr[i]%arr[j]==0) {
-                    temp[k]=arr[i]/arr[j];
-                    stepA[depth]=arr[i]; stepB[depth]=arr[j]; stepOp[depth]='/'; stepR[depth]=temp[k];
-                    if (solve(temp,k+1,depth+1)) return 1;
-                }
+void flood(int x, int y,int arr[100][100],int brr[100][100]) {
+    int dx[] = {-1, 1, 0, 0};
+    int dy[] = {0, 0, -1, 1};
+    if(x<0 || x>n || y<0 || y>m) return;
+    if(brr[x][y]||arr[x][y]==0) return;
+    else {
+        brr[x][y] =1;
+            for(int i=0;i<4;i++) {
+                int nx=x+dx[i];
+                int ny=y+dy[i];
+                flood(nx,ny,arr,brr);
             }
         }
-        return 0;
     }
-}
 
-int main(){
-    int arr[4]={0};
-    for (int i=0;i<4;i++) scanf("%d",&arr[i]);
+int main() {
+    scanf("%d%d",&n,&m);
 
-    int m=solve(arr,4,0);
-    if (m) {
-        for (int s=0;s<stepCount;s++) {
-            printf("%d%c%d=%d\n", stepA[s], stepOp[s], stepB[s], stepR[s]);
+    int count=0;
+    for(int i=0;i<n;i++) {
+        char str[100];
+        scanf("%s",str);
+        change(str,i,m);
+    }
+    for(int i=0;i<n;i++) {
+        for(int j=0;j<m;j++) {
+            if(arr[i][j]&&brr[i][j]==0) count++;
+            flood(i,j,arr,brr);
         }
-    } else {
-        printf("No answer!\n");
     }
+    printf("%d",count);
     return 0;
 }
