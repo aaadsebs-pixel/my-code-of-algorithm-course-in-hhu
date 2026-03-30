@@ -1,74 +1,64 @@
 #include <stdio.h>
 #include <stdlib.h>
-int n,m;
-int l[8]={0,1,1,1,0,-1,-1,-1};
-int w[8]={1,1,0,-1,-1,-1,0,1};
-void change(int arr[n][m],int brr[n][m],int x,int y) {
-    if (arr[x][y]) {
-        brr[x][y] =66;
-    }
+int n;
+void flood(int x, int y,int arr[n][n],int brr[n][n]) {
+    int dx[] = {-1, 1, 0, 0};
+    int dy[] = {0, 0, -1, 1};
+    if(x<0 || x>=n || y<0 || y>=n) return;
+    if(brr[x][y]||arr[x][y]!=0) return;
     else {
-        for (int i=0;i<8;i++) {
-            int dx = x+l[i];
-            int dy = y+w[i];
-            if (dx>=0 && dx<n && dy>=0 && dy<m) {
-                brr[x][y]+=arr[dx][dy];
-            }
+        brr[x][y] =1;
+        for(int i=0;i<4;i++) {
+            int nx=x+dx[i];
+            int ny=y+dy[i];
+            flood(nx,ny,arr,brr);
         }
     }
 }
-void flood(int x, int y,int brr[n][m],int crr[n][m]) {
-    if(x<0 || x>=n || y<0 || y>=m) return;
-    if(brr[x][y]==66||crr[x][y]) return;
-    else {
-        crr[x][y] =1;
-        if (brr[x][y]==0) {
-            for(int i=0;i<8;i++) {
-                int nx=x+l[i];
-                int ny=y+w[i];
-                flood(nx,ny,brr,crr);
-            }
-        }
-    }
-}
-
-
 
 int main() {
-    scanf("%d %d",&n,&m);
-    int(*arr)[m] = (int(*)[m])calloc(n*m,sizeof(int));
-    int(*brr)[m] = (int(*)[m])calloc(n*m,sizeof(int));
-    int(*crr)[m] = (int(*)[m])calloc(n*m,sizeof(int));
-    if(arr==NULL||brr==NULL||crr==NULL) return -1;
+    scanf("%d",&n);
+    int(*arr)[n]=(int(*)[n])calloc(n*n,sizeof(int));
+    int(*brr)[n]=(int(*)[n])calloc(n*n,sizeof(int));
+    if(arr==NULL || brr==NULL) return-1;
     for(int i=0;i<n;i++) {
-        for(int j=0;j<m;j++) {
+        for(int j=0;j<n;j++) {
             scanf("%d",&arr[i][j]);
         }
     }
+
     for(int i=0;i<n;i++) {
-        for(int j=0;j<m;j++) change(arr,brr,i,j);
-    }
-    int count=0;
-    for(int k=0;k<n;k++){
-        for(int j=0;j<m;j++) {
-            if (crr[k][j]==0&&brr[k][j]==0) {
-                count++;
-                flood(k,j,brr,crr);
+        for(int j=0;j<2;j++) {
+            if(j==0) {
+                if(arr[i][j]==0 && brr[i][j]==0) {
+                    flood(i,j,arr,brr);
+                }
+                if(arr[j][i]==0 && brr[j][i]==0) {
+                    flood(j,i,arr,brr);
+                }
+
+            }
+                else {
+                    if(arr[i][n-1]==0 && brr[i][n-1]==0) {
+                    flood(i,n-1,arr,brr);
+                }
+                    if(arr[n-1][i]==0 && brr[n-1][i]==0) {
+                        flood(n-1,i,arr,brr);
+                    }
             }
         }
     }
-    for(int k=0;k<n;k++){
-        for(int j=0;j<m;j++) {
-            if (crr[k][j]==0&&brr[k][j]!=66) {
-                count++;
-                flood(k,j,brr,crr);
-            }
+for(int i=0;i<n;i++) {
+    for(int j=0;j<n;j++) {
+        if (arr[i][j]==0 && brr[i][j]==0) {
+            arr[i][j]=2;
         }
+        printf("%d ",arr[i][j]);
     }
-    printf("%d\n",count);
+    printf("\n");
+}
 
     free(arr);
     free(brr);
-    free(crr);
     return 0;
 }
