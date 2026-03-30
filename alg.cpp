@@ -1,19 +1,25 @@
-#include <vector>
+#include <queue>
 #include <iostream>
 using namespace std;
 int main() {
-    vector<int> student;
+     queue<int> student;
     int n,m;
     cin>>n>>m;
-    for(int i=0;i<n;i++) {
-        int a;
-        cin>>a;
-        student.push_back(a);
+    for(int i=1;i<n+1;i++) {
+        student.push(i);
     }
-    for(int i=0;i<m;i++) {
-        int x;
-        cin>>x;
-        cout<<student[x-1]<<endl;
+    int count=0;
+    int current;
+    while(!student.empty()) {
+        current=student.front();
+        student.pop();
+        count++;
+        if(count%m) {
+            student.push(current);
+        }
+        else {
+            cout <<current<< " ";
+        }
     }
 return 0;
 }
