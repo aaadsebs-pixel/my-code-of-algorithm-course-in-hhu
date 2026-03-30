@@ -1,38 +1,36 @@
-#include <stack>
+#include <map>
 #include <string>
 #include <iostream>
 using namespace std;
-char tans(char c) {
-    if(c=='(') return ')';
-    if(c=='[') return ']';
-    if(c=='{') return '}';
-    return ' ';
-}
 int main() {
-     stack<char>bracket;
+    map<string, int> ds;
     int n;
-    cin>>n;
-    string line;
-    cin.ignore();
-    while(getline(cin,line)) {
-        while(!bracket.empty())  bracket.pop();
-        for(int k=0; k<line.size(); k++){
-            if (bracket.empty()) {
-                bracket.push(line[k]);
-            }
-            else if (line[k]==tans(bracket.top())) {
-                bracket.pop();
-            }
-            else {
-                bracket.push(line[k]);
-            }
+    cin >> n;
+    for (int i = 0; i < n; i++) {
+        int op,num;
+        string name;
+        cin >> op;
+        if (op == 1) {
+            cin>>name>>num;
+            ds[name] = num;
+            if (ds.find(name)!=ds.end()) cout <<"ok"<<endl;
         }
-        if(bracket.empty()) {
-            cout<<"YES"<<endl;
+        else if (op == 2) {
+            cin>>name;
+            if (ds.find(name)!=ds.end()) cout <<ds[name]<<endl;
+            else cout <<"Not found"<<endl;
         }
-        else {
-            cout<<"NO"<<endl;
+        else if (op == 3) {
+            cin>>name;
+            if (ds.find(name)!=ds.end()) {
+                ds.erase(name);
+                cout <<"Deleted successfully"<<endl;
+            }
+            else cout <<"Not found"<<endl;
+        }
+        else if (op == 4) {
+            cout <<ds.size()<<endl;
         }
     }
-return 0;
+    return 0;
 }
