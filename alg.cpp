@@ -1,63 +1,86 @@
 #include <iostream>
 #include <vector>
+#include <stack>
 #include <queue>
+#include <algorithm>
 using namespace std;
 
-int n, m;
-int sx, sy, fx, fy;
-bool reachable = false;
+vector<vector<int>> adj;
+vector<bool> vis1, vis2;
 
-vector<vector<int>> blocked;
-vector<vector<int>> visited;
+void dfs(int start) {
+    stack<int> s;
+    s.push(start);
+    vis1[start] = true;
+    cout << start << " ";
 
-int dx[4] = {1, -1, 0, 0};
-int dy[4] = {0, 0, 1, -1};
+    while (!s.empty()) {
+        int current = s.top();
+        bool found = false;
 
-int main() {
-    cin >> n >> m;
-    sx = 0, sy = 0, fx = n - 1, fy = m - 1;
+        for (int i = 0; i < (int)adj[current].size(); i++) {
+            int neighbor = adj[current][i];
+            if (!vis1[neighbor]) {
+                s.push(neighbor);
+                vis1[neighbor] = true;
+                cout << neighbor << " ";
+                found = true;
+                break;
+            }
+        }
 
-    blocked.assign(n, vector<int>(m, 0));
-    visited.assign(n, vector<int>(m, 0));
-
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j < m; j++) {
-            char c;
-            cin >> c;
-            blocked[i][j] = (c == '#');
+        if (!found) {
+            s.pop();
         }
     }
+    cout << "\n";
+}
 
-    if (blocked[sx][sy] || blocked[fx][fy]) {
-        cout << "No" << endl;
-        return 0;
-    }
+void bfs(int start) {
+    queue<int> q;
+    q.push(start);
+    vis2[start] = true;
+    cout << start << " ";
 
-    queue<pair<int, int>> q;
-    visited[sx][sy] = 1;
-    q.push({sx, sy});
-
-    while (!q.empty() && !reachable) {
-        auto [x, y] = q.front();
+    while (!q.empty()) {
+        int current = q.front();
         q.pop();
 
-        if (x == fx && y == fy) {
-            reachable = true;
-            break;
-        }
-
-        for (int i = 0; i < 4; i++) {
-            int nx = x + dx[i];
-            int ny = y + dy[i];
-
-            if (nx < 0 || nx >= n || ny < 0 || ny >= m) continue;
-            if (blocked[nx][ny] || visited[nx][ny]) continue;
-
-            visited[nx][ny] = 1;
-            q.push({nx, ny});
+        for (int neighbor : adj[current]) {
+            if (!vis2[neighbor]) {
+                q.push(neighbor);
+                vis2[neighbor] = true;
+                cout << neighbor << " ";
+            }
         }
     }
+    cout << "\n";
+}
 
-    cout << (reachable ? "Yes" : "No") << endl;
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+
+    int n, m; // n: 边数, m: 点数(点编号 1..m)
+    cin >> n >> m;
+
+    adj.resize(m + 1);
+    vis1.assign(m + 1, false);
+    vis2.assign(m + 1, false);
+
+    for (int i = 1; i <= m; i++) {
+        int a, c;
+        cin >> a >> c;
+        adj[a].push_back(c);     // 有向图
+        // adj[c].push_back(a);  // 如果是无向图，取消注释
+    }
+
+    for (int i = 1; i <= m; i++) {
+        sort(adj[i].begin(), adj[i].end());
+    }
+
+    dfs(1);
+    bfs(1);
+
     return 0;
 }
